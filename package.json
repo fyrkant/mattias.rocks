@@ -1,0 +1,38 @@
+{
+  "name": "11ty",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "eleventy",
+    "watch": "eleventy --watch",
+    "serve": "eleventy --serve",
+    "dev": "npm run css | npm run serve",
+    "debug": "DEBUG=* eleventy",
+    "css": "postcss styles.pcss -o _site/styles.min.css -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@11ty/eleventy": "^0.11.0",
+    "@11ty/eleventy-navigation": "^0.1.5",
+    "@11ty/eleventy-plugin-rss": "^1.0.7",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^3.0.1",
+    "cssnano": "^4.1.10",
+    "luxon": "^1.24.1",
+    "markdown-it": "^11.0.0",
+    "markdown-it-anchor": "^5.3.0",
+    "postcss": "^7.0.31",
+    "postcss-cli": "^7.1.1",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-each": "^0.10.0",
+    "postcss-import": "^12.0.1",
+    "postcss-nested": "^4.2.1",
+    "tachyons": "^4.12.0",
+    "tachyons-generator": "^0.23.0"
+  },
+  "dependencies": {
+    "@mightyplow/eleventy-plugin-cache-buster": "^1.1.3"
+  }
+}
