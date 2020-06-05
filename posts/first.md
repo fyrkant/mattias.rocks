@@ -1,6 +1,7 @@
 ---
 tags: post
 title: first post
+date:
 ---
 
 ### Shit!

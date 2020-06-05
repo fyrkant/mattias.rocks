@@ -1,1 +1,10 @@
 @import "tachyons";
+
+li.hidden-item {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+}
+
+li.hidden-item.show {
+  opacity: 1;
+}
