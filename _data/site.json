@@ -1,0 +1,17 @@
+{
+  "title": "mattias.rocks",
+  "url": "https://mattias.rocks/",
+  "description": "Nothing interesting.",
+  "repo": "",
+  "feed": {
+    "subtitle": "Nothing interesting.",
+    "filename": "feed.xml",
+    "path": "/feed/feed.xml",
+    "id": "https://myurl.com/"
+  },
+  "author": {
+    "name": "Mattias Wikström",
+    "email": "fyrkant@gmail.com",
+    "avatar": "/images/avatar.jpg"
+  }
+}

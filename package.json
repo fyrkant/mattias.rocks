@@ -9,7 +9,7 @@
     "serve": "eleventy --serve",
     "dev": "npm run css | npm run serve",
     "debug": "DEBUG=* eleventy",
-    "css": "postcss styles.pcss -o _site/styles.min.css -w"
+    "css": "postcss css/styles.pcss -o _site/styles.min.css -w"
   },
   "keywords": [],
   "author": "",

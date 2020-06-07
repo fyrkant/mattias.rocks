@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.min.css" />
+    <link
+      href="https://unpkg.com/browse/prismjs@1.20.0/themes/prism-okaidia.css"
+      rel="stylesheet"
+    />
+    <title>{{ site.title }}</title>
+  </head>
+  <body>
+    <section class="mw7 center">
+      {% if title %}
+      <div class="flex justify-between athelas">
+        <div>
+
+          <h2 class="ph3 f2 mt3 mb1 ph0-1">{{ title }}</h2>
+          <p class="ph3 f5 gray i">
+            <date>{{ date | formatDate }}</date>
+          </p>
+        </div>
+        <h3 class="ph3 f3 ph0-1">
+          <a class="link dim blue" href="/">
+            {{ site.title }}
+          </a>
+        </h4>
+      </div>
+      {% else %}
+      <h2 class="athelas ph3 f2 mt3 mb1 ph0-1">{{ site.title }}</h2>
+      {% endif %} {{ content}}
+    </section>
+  </body>
+</html>

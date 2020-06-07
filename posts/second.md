@@ -1,6 +1,7 @@
 ---
 tags: post
 title: the second post
+layout: post
 ---
 
 ### wow!
