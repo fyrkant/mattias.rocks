@@ -2,25 +2,21 @@
 layout: layout.html
 ---
 
-<ol class="list ph3 pl0">
+<ol>
   {%- for post in collections.post -%}
-  <li
-    class="lh-copy pv2 ba bl-0 bt-0 br-0 b--dotted b--black-30 list-item avenir"
-  >
-    <a class="link dim blue ttc f2 lh-copy" href="{{ post.url | url }}"
-      >{{ post.data.title }}</a
-    >
-    <small class="gray db pv1"><time>{{ post.date | formatDate }}</time></small>
+  <li>
+    <a href="{{ post.url | url }}">{{ post.data.title }}</a>
+    <small><time>{{ post.date | formatDate }}</time></small>
   </li>
   {%- endfor -%}
 </ol>
 <script>
-  const listItems = document.querySelectorAll("li.list-item");
+  // const listItems = document.querySelectorAll("li.list-item");
 
-  Array.from(listItems).map((li, index) => {
-    li.classList.add("hidden");
-    setTimeout(() => {
-      li.classList.add("show");
-    }, 200 + 100 * index);
-  });
+  // Array.from(listItems).map((li, index) => {
+  //   li.classList.add("hidden");
+  //   setTimeout(() => {
+  //     li.classList.add("show");
+  //   }, 200 + 100 * index);
+  // });
 </script>

@@ -3,33 +3,64 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/styles.min.css" />
-    <link
-      href="https://unpkg.com/browse/prismjs@1.20.0/themes/prism-okaidia.css"
+    <!-- <link rel="stylesheet" href="/styles.min.css" /> -->
+    <!-- <link
       rel="stylesheet"
+      href="https://cdn.rawgit.com/kimeiga/bahunya/css/bahunya-0.1.3.css"
+    /> -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/axist@latest/dist/axist.min.css"
     />
+
     <title>{{ site.title }}</title>
   </head>
   <body>
-    <section class="mw7 center">
-      {% if title %}
-      <div class="flex justify-between athelas">
-        <div>
-
-          <h2 class="ph3 f2 mt3 mb1 ph0-1">{{ title }}</h2>
-          <p class="ph3 f5 gray i">
-            <date>{{ date | formatDate }}</date>
-          </p>
-        </div>
-        <h3 class="ph3 f3 ph0-1">
-          <a class="link dim blue" href="/">
+    <header>
+      <nav>
+        <h1>
+          <a href="/">
             {{ site.title }}
           </a>
-        </h4>
-      </div>
+        </h1>
+      </nav>
+      {% if title %}
+      <h1>
+        {{ title }}
+      </h1>
+      <p>
+        <date>{{ date | formatDate }}</date>
+      </p>
       {% else %}
-      <h2 class="athelas ph3 f2 mt3 mb1 ph0-1">{{ site.title }}</h2>
-      {% endif %} {{ content}}
-    </section>
+      <h1>
+        {{ site.title }}
+      </h1>
+
+      {% endif %}
+    </header>
+    <main>
+      <section>
+        {% if title %}
+        <div>
+          <!-- <div>
+            <h3>
+              <a href="/">
+                {{ site.title }}
+              </a>
+            </h3>
+            <p>
+              Mattias Wikström
+            </p>
+          </div> -->
+        </div>
+        {% endif %} {{ content}}
+      </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.0.0/quicklink.umd.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        quicklink.listen();
+      });
+    </script>
   </body>
 </html>
