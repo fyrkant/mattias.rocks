@@ -8,7 +8,7 @@
     "build": "npm run clean && eleventy && npm run css",
     "watch": "eleventy --watch",
     "serve": "eleventy --serve",
-    "dev": "npm run css | npm run serve",
+    "dev": "npm run css:watch | npm run serve",
     "debug": "DEBUG=* eleventy",
     "css": "postcss css/styles.pcss -o _site/styles.min.css",
     "css:watch": "postcss css/styles.pcss -o _site/styles.min.css -w"
