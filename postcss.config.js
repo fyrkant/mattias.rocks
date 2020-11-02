@@ -5,7 +5,6 @@ module.exports = {
   plugins: [
     require('postcss-import'),
     require('postcss-nested'),
-    // require('postcss-each'),
     cssnext({
       features: {
         customProperties: {
@@ -13,9 +12,9 @@ module.exports = {
         },
       },
     }),
+    require('cssnano'),
     purgecss({
       content: ['./_site/**/*.html'],
     }),
-    require('cssnano'),
   ],
 };

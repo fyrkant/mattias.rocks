@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "eleventy && npm run css",
+    "clean": "rm -rf _site",
+    "build": "npm run clean && eleventy && npm run css",
     "watch": "eleventy --watch",
     "serve": "eleventy --serve",
     "dev": "npm run css | npm run serve",
     "debug": "DEBUG=* eleventy",
-    "css": "postcss css/styles.pcss -o _site/styles.min.css -w"
+    "css": "postcss css/styles.pcss -o _site/styles.min.css",
+    "css:watch": "postcss css/styles.pcss -o _site/styles.min.css -w"
   },
   "keywords": [],
   "author": "",
