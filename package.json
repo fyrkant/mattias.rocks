@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "eleventy",
+    "build": "eleventy && npm run css",
     "watch": "eleventy --watch",
     "serve": "eleventy --serve",
     "dev": "npm run css | npm run serve",
@@ -15,25 +15,26 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@11ty/eleventy": "^0.11.0",
+    "@11ty/eleventy": "^0.11.1",
     "@11ty/eleventy-navigation": "^0.1.6",
     "@11ty/eleventy-plugin-rss": "^1.0.9",
-    "@11ty/eleventy-plugin-syntaxhighlight": "^3.0.2",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^3.0.4",
+    "@fullhuman/postcss-purgecss": "^3.0.0",
     "cssnano": "^4.1.10",
-    "dayjs": "^1.9.1",
+    "dayjs": "^1.9.4",
     "luxon": "^1.25.0",
-    "markdown-it": "^11.0.1",
+    "markdown-it": "^12.0.2",
     "markdown-it-anchor": "^6.0.0",
-    "postcss": "^8.1.1",
-    "postcss-cli": "^8.1.0",
+    "postcss": "^8.1.4",
+    "postcss-cli": "^8.2.0",
     "postcss-cssnext": "^3.1.0",
     "postcss-each": "^0.10.0",
-    "postcss-import": "^12.0.1",
+    "postcss-import": "^13.0.0",
     "postcss-nested": "^5.0.1",
-    "tachyons": "^4.12.0",
-    "tachyons-generator": "^0.23.0"
+    "purgecss": "^3.0.0"
   },
   "dependencies": {
-    "@mightyplow/eleventy-plugin-cache-buster": "^1.1.3"
+    "@mightyplow/eleventy-plugin-cache-buster": "^1.1.3",
+    "prettier": "^2.1.2"
   }
 }

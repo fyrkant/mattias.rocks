@@ -11,4 +11,5 @@ module.exports = function(eleventyConfig) {
     eleventyConfig.addFilter('formatDate', (val) => {
       return dayjs(val).format('dddd, Do of MMMM YYYY')
     })
+    eleventyConfig.addPassthroughCopy("img");
 };

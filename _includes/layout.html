@@ -3,15 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon/favicon-16x16.png" />
     <link rel="stylesheet" href="/styles.min.css" />
-    <!-- <link
-      rel="stylesheet"
-      href="https://cdn.rawgit.com/kimeiga/bahunya/css/bahunya-0.1.3.css"
-    /> -->
-    <!-- <link
-      rel="stylesheet"
-      href="https://unpkg.com/axist@latest/dist/axist.min.css"
-    /> -->
 
     <title>{{ site.title }}</title>
   </head>
@@ -19,46 +14,29 @@
     <header>
       <nav>
         <h1>
-          <a href="/">
-            {{ site.title }}
-          </a>
+          <a href="/"> {{ site.title }} </a>
         </h1>
       </nav>
       {% if title %}
-      <h1>
-        {{ title }}
-      </h1>
+      <h1>{{ title }}</h1>
       <p>
         <date>{{ date | formatDate }}</date>
       </p>
       {% else %}
-      <h1>
-        {{ site.title }}
-      </h1>
+      <h1>{{ site.title }}</h1>
 
       {% endif %}
     </header>
     <main>
       <section>
         {% if title %}
-        <div>
-          <!-- <div>
-            <h3>
-              <a href="/">
-                {{ site.title }}
-              </a>
-            </h3>
-            <p>
-              Mattias Wikström
-            </p>
-          </div> -->
-        </div>
+        <div></div>
         {% endif %} {{ content}}
       </section>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.0.0/quicklink.umd.js"></script>
     <script>
-      window.addEventListener("load", () => {
+      window.addEventListener('load', () => {
         quicklink.listen();
       });
     </script>

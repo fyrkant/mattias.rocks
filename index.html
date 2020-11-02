@@ -3,20 +3,10 @@ layout: layout.html
 ---
 
 <ol>
-  {%- for post in collections.post -%}
+  {% for post in collections.post reversed %}
   <li>
     <a href="{{ post.url | url }}">{{ post.data.title }}</a>
     <small><time>{{ post.date | formatDate }}</time></small>
   </li>
-  {%- endfor -%}
+  {% endfor %}
 </ol>
-<script>
-  // const listItems = document.querySelectorAll("li.list-item");
-
-  // Array.from(listItems).map((li, index) => {
-  //   li.classList.add("hidden");
-  //   setTimeout(() => {
-  //     li.classList.add("show");
-  //   }, 200 + 100 * index);
-  // });
-</script>

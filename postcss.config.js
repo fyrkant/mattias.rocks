@@ -1,4 +1,5 @@
 const cssnext = require('postcss-cssnext');
+const purgecss = require('@fullhuman/postcss-purgecss');
 
 module.exports = {
   plugins: [
@@ -8,10 +9,13 @@ module.exports = {
     cssnext({
       features: {
         customProperties: {
-          preserve: true
-        }
-      }
+          preserve: true,
+        },
+      },
     }),
-    require('cssnano')
-  ]
+    purgecss({
+      content: ['./_site/**/*.html'],
+    }),
+    require('cssnano'),
+  ],
 };
