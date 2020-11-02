@@ -24,6 +24,7 @@
     "@fullhuman/postcss-purgecss": "^3.0.0",
     "cssnano": "^4.1.10",
     "dayjs": "^1.9.4",
+    "hasha": "^5.2.2",
     "luxon": "^1.25.0",
     "markdown-it": "^12.0.2",
     "markdown-it-anchor": "^6.0.0",

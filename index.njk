@@ -1,9 +1,9 @@
 ---
-layout: layout.html
+layout: layout.njk
 ---
 
 <ul>
-  {% for post in collections.post reversed %}
+  {% for post in collections.post | reverse %}
   <li>
     <a href="{{ post.url | url }}">{{ post.data.title }}</a>
     <small><time>{{ post.date | formatDate }}</time></small>
