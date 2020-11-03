@@ -36,16 +36,11 @@
       <p>
         <date>{{ date | formatDate }}</date>
       </p>
-      {% else %}
-      <!-- <h1>{{ site.title }}</h1> -->
-
       {% endif %}
     </header>
     <main>
       <section>
-        {% if title %}
-        <div></div>
-        {% endif %} {{ content}}
+        {{ content | safe }}
       </section>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.0.0/quicklink.umd.js"></script>
