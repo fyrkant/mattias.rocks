@@ -26,7 +26,7 @@
     "dayjs": "^1.9.4",
     "hasha": "^5.2.2",
     "luxon": "^1.25.0",
-    "markdown-it": "^12.0.2",
+    "markdown-it": "^12.3.2",
     "markdown-it-anchor": "^6.0.0",
     "postcss": "^8.1.4",
     "postcss-cli": "^8.2.0",
