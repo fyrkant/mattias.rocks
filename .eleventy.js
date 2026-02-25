@@ -3,7 +3,7 @@ const pluginSyntaxHighlight = require('@11ty/eleventy-plugin-syntaxhighlight');
 const advancedFormat = require('dayjs/plugin/advancedFormat');
 const fs = require('fs');
 const { promisify } = require('util');
-const hasha = require('hasha');
+const crypto = require('crypto');
 const readFile = promisify(fs.readFile);
 dayjs.extend(advancedFormat);
 
@@ -17,7 +17,7 @@ const hashPath = async (path) => {
   const file = await readFile(`_site${path}`, {
     encoding: 'utf-8',
   });
-  const hash = await hasha.async(file);
+  const hash = crypto.createHash('sha512').update(file).digest('hex');
   const hashedPath = `${path}?hash=${hash.substr(0, 10)}`;
   console.log('hashed', hashedPath);
   return hashedPath;
