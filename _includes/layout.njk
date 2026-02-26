@@ -76,25 +76,24 @@
         }
         function dot3(a, b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
 
-        // Camera — same as Three.js scene: eye=(0,3,12), lookAt=(0,2,0)
+        // Camera
         var EYE = [0, 3, 12];
-        var FWD   = norm3([0, 2-3, 0-12]);          // toward target
+        var FWD   = norm3([0, 2-3, 0-12]);
         var RIGHT = norm3(cross3(FWD, [0, 1, 0]));
         var UP    = cross3(RIGHT, FWD);
-        var HALF_TAN = Math.tan(25 * Math.PI / 180); // tan(FOV/2), FOV=50°
+        var HALF_TAN = Math.tan(25 * Math.PI / 180);
 
-        // Lighting — AmbientLight(0x334477, 0.8) + DirectionalLight(0xffd0a0, 1.2) @ (5,8,3)
+        // Lighting
         var SUN   = norm3([5, 8, 3]);
         var AMB   = [0x33/255*0.8, 0x44/255*0.8, 0x77/255*0.8];
         var SUN_C = [0xff/255*1.2, 0xd0/255*1.2, 0xa0/255*1.2];
 
-        // Stars: pre-generated random positions (same distribution as Three.js scene)
+        // Fewer stars
         var stars = [];
-        for (var i = 0; i < 250; i++) {
+        for (var i = 0; i < 60; i++) {
           stars.push([(Math.random()-0.5)*50, Math.random()*20+2, (Math.random()-0.5)*50-15]);
         }
 
-        // Perspective project a world point; returns [sx, sy, depth] or null if behind camera
         function project(wx, wy, wz) {
           var dx=wx-EYE[0], dy=wy-EYE[1], dz=wz-EYE[2];
           var cx=dot3([dx,dy,dz], RIGHT);
@@ -105,13 +104,11 @@
           return [cx/cz*f + W*0.5, -cy/cz*f + H*0.5, cz];
         }
 
-        // Rotate a point around Y axis
         function rotPt(p, ry) {
           var c=Math.cos(ry), s=Math.sin(ry);
           return [c*p[0]+s*p[2], p[1], -s*p[0]+c*p[2]];
         }
 
-        // Flat-shaded Phong color: base=[r,g,b] in 0-255, wv=world vertices
         function shade(base, wv) {
           var ab=[wv[1][0]-wv[0][0], wv[1][1]-wv[0][1], wv[1][2]-wv[0][2]];
           var ac=[wv[2][0]-wv[0][0], wv[2][1]-wv[0][1], wv[2][2]-wv[0][2]];
@@ -124,9 +121,8 @@
             Math.round(Math.min(255, b2*(AMB[2]+d*SUN_C[2])*255))+')';
         }
 
-        // Geometry builders — {verts:[[x,y,z],...], faces:[{v:[indices], c:[r,g,b]},...]}
-        // LatheGeometry: rotate 2D profile around Y axis
-        function buildLathe(prof) {
+        // LatheGeometry with explicit color
+        function buildLathe(prof, col) {
           var verts=[], faces=[], pn=prof.length;
           for (var seg=0; seg<=SEGS; seg++) {
             var ang=(seg/SEGS)*Math.PI*2;
@@ -136,27 +132,13 @@
           for (var seg=0; seg<SEGS; seg++)
             for (var pi=0; pi<pn-1; pi++) {
               var va=seg*pn+pi, vb=seg*pn+pi+1, vc=(seg+1)*pn+pi+1, vd=(seg+1)*pn+pi;
-              faces.push({v:[va,vb,vc,vd], c:[107,90,74]});
+              faces.push({v:[va,vb,vc,vd], c:col});
             }
           return {verts:verts, faces:faces};
         }
 
-        // ConeGeometry: apex at cyOff+h/2, base ring at cyOff-h/2
-        function buildCone(r, h, cyOff) {
-          var verts=[[0, cyOff+h*0.5, 0]], faces=[];
-          for (var seg=0; seg<SEGS; seg++) {
-            var ang=(seg/SEGS)*Math.PI*2;
-            verts.push([r*Math.cos(ang), cyOff-h*0.5, r*Math.sin(ang)]);
-          }
-          for (var seg=0; seg<SEGS; seg++) {
-            var nxt=(seg+1)%SEGS;
-            faces.push({v:[0, nxt+1, seg+1], c:[232,238,244]});
-          }
-          return {verts:verts, faces:faces};
-        }
-
-        // CylinderGeometry: top radius rT, bottom radius rB, centered at y=0
-        function buildCylinder(rT, rB, h) {
+        // CylinderGeometry with explicit color
+        function buildCylinder(rT, rB, h, col) {
           var verts=[], faces=[];
           for (var seg=0; seg<=SEGS; seg++) {
             var ang=(seg/SEGS)*Math.PI*2;
@@ -164,22 +146,25 @@
             verts.push([rB*Math.cos(ang), -h*0.5, rB*Math.sin(ang)]);
           }
           for (var seg=0; seg<SEGS; seg++)
-            faces.push({v:[seg*2, (seg+1)*2, (seg+1)*2+1, seg*2+1], c:[45,74,45]});
+            faces.push({v:[seg*2, (seg+1)*2, (seg+1)*2+1, seg*2+1], c:col});
           // Top cap (winding reversed so normal points up toward camera)
           var ci=verts.length;
           verts.push([0, h*0.5, 0]);
           for (var seg=0; seg<SEGS; seg++) {
             var nxt=(seg+1)%SEGS;
-            faces.push({v:[ci, nxt*2, seg*2], c:[45,74,45]});
+            faces.push({v:[ci, nxt*2, seg*2], c:col});
           }
           return {verts:verts, faces:faces};
         }
 
-        var PROF = [[4,0],[3.5,0.4],[2.8,1.1],[2,2.1],[1.4,3.1],[0.9,3.9],[0.5,4.5],[0,5]];
+        // Two-part profile split at snow line — lower dark rock, upper snow cap.
+        // Both share the seam point so the surface is seamless.
+        var LOWER = [[4.5,0],[4.3,0.3],[3.8,0.8],[3.1,1.5],[2.3,2.3],[1.6,3.1]];
+        var UPPER = [[1.6,3.1],[1.0,3.8],[0.4,4.5],[0,5]];
         var MESHES = [
-          buildLathe(PROF),
-          buildCone(0.9, 1.4, 4.7),      // snow.position.y = 4.7
-          buildCylinder(4.2, 4.8, 0.5)
+          buildLathe(LOWER, [42,46,58]),       // dark charcoal volcanic rock
+          buildLathe(UPPER, [228,234,242]),     // snow cap
+          buildCylinder(4.8, 5.1, 0.4, [32,58,32])
         ];
 
         function render() {
