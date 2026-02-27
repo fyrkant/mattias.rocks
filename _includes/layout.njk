@@ -101,7 +101,7 @@
           var cz=dot3([dx,dy,dz], FWD);
           if (cz < 0.01) return null;
           var f = (H*0.5) / HALF_TAN;
-          return [cx/cz*f + W*0.5, -cy/cz*f + H*0.33, cz];
+          return [cx/cz*f + W*0.5, -cy/cz*f + H*0.5, cz];
         }
 
         function rotPt(p, ry) {
@@ -160,7 +160,7 @@
         // Two-part profile split at snow line — lower dark rock, upper snow cap.
         // Both share the seam point so the surface is seamless.
         var LOWER = [[4.5,0],[4.3,0.3],[3.8,0.8],[3.1,1.5],[2.3,2.3],[1.6,3.1]];
-        var UPPER = [[1.6,3.1],[1.0,3.8],[0.4,4.5],[0,5]];
+        var UPPER = [[1.6,3.1],[1.0,3.8],[0.4,4.5],[0.01,5]];
         var MESHES = [
           buildLathe(LOWER, [42,46,58]),       // dark charcoal volcanic rock
           buildLathe(UPPER, [228,234,242]),     // snow cap
