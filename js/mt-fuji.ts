@@ -31,7 +31,8 @@ interface ProjectedFace {
 
   let dragging = false;
   let lastX = 0;
-  let velocity = 0.006;
+  const BASE_VELOCITY = 0.006;
+  let velocity = BASE_VELOCITY;
 
   function resize(): void {
     W = Math.max(1, Math.round(canvas!.clientWidth * 0.5));
@@ -230,8 +231,7 @@ interface ProjectedFace {
     requestAnimationFrame(loop);
     if (!dragging) {
       rotY += velocity;
-      velocity *= 0.95;
-      if (Math.abs(velocity) < 0.0005) velocity = 0.0005;
+      velocity += (BASE_VELOCITY - velocity) * 0.02;
     }
     render();
   }
