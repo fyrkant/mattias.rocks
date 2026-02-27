@@ -101,7 +101,7 @@
           var cz=dot3([dx,dy,dz], FWD);
           if (cz < 0.01) return null;
           var f = (H*0.5) / HALF_TAN;
-          return [cx/cz*f + W*0.5, -cy/cz*f + H*0.5, cz];
+          return [cx/cz*f + W*0.5, -cy/cz*f + H*0.33, cz];
         }
 
         function rotPt(p, ry) {
