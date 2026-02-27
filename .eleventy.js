@@ -23,7 +23,12 @@ const hashPath = async (path) => {
   return hashedPath;
 };
 
-module.exports = function (eleventyConfig) {
+module.exports = async function (eleventyConfig) {
+  const { default: EleventyVitePlugin } = await import("@11ty/eleventy-plugin-vite");
+  eleventyConfig.addPlugin(EleventyVitePlugin, {
+    viteOptions: { build: { emptyOutDir: false } },
+  });
+  eleventyConfig.addPassthroughCopy("js");
   eleventyConfig.addPlugin(pluginSyntaxHighlight);
   eleventyConfig.addFilter('formatDate', (val) => {
     return dayjs(val).format('dddd, Do of MMMM YYYY');
