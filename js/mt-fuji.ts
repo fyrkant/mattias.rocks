@@ -1,0 +1,195 @@
+type Vec3 = [number, number, number];
+type Color = [number, number, number];
+type Profile = [number, number][];
+
+interface Face {
+  v: number[];
+  c: Color;
+}
+
+interface Mesh {
+  verts: Vec3[];
+  faces: Face[];
+}
+
+interface ProjectedFace {
+  pv: Vec3[];
+  wv: Vec3[];
+  c: Color;
+  depth: number;
+}
+
+(() => {
+  const canvas = document.getElementById("mt-fuji") as HTMLCanvasElement | null;
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d")!;
+
+  const SEGS = 9;
+  let rotY = 0;
+  let W = 1;
+  let H = 1;
+
+  function resize(): void {
+    W = Math.max(1, Math.round(canvas!.clientWidth * 0.5));
+    H = Math.max(1, Math.round(canvas!.clientHeight * 0.5));
+    canvas!.width = W;
+    canvas!.height = H;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  function norm3([x, y, z]: Vec3): Vec3 {
+    const l = Math.sqrt(x * x + y * y + z * z) || 1;
+    return [x / l, y / l, z / l];
+  }
+
+  function cross3([ax, ay, az]: Vec3, [bx, by, bz]: Vec3): Vec3 {
+    return [ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx];
+  }
+
+  function dot3([ax, ay, az]: Vec3, [bx, by, bz]: Vec3): number {
+    return ax * bx + ay * by + az * bz;
+  }
+
+  const EYE: Vec3 = [0, 3, 12];
+  const FWD = norm3([0, 2 - 3, 0 - 12] as Vec3);
+  const RIGHT = norm3(cross3(FWD, [0, 1, 0]));
+  const UP = cross3(RIGHT, FWD);
+  const HALF_TAN = Math.tan((25 * Math.PI) / 180);
+
+  const SUN: Vec3 = norm3([5, 8, 3]);
+  const AMB: Vec3 = [(0x33 / 255) * 0.8, (0x44 / 255) * 0.8, (0x77 / 255) * 0.8];
+  const SUN_C: Vec3 = [(0xff / 255) * 1.2, (0xd0 / 255) * 1.2, (0xa0 / 255) * 1.2];
+
+  const stars: Vec3[] = Array.from(
+    { length: 60 },
+    () =>
+      [
+        (Math.random() - 0.5) * 50,
+        Math.random() * 20 + 2,
+        (Math.random() - 0.5) * 50 - 15,
+      ] as Vec3
+  );
+
+  function project(wx: number, wy: number, wz: number): Vec3 | null {
+    const d: Vec3 = [wx - EYE[0], wy - EYE[1], wz - EYE[2]];
+    const cx = dot3(d, RIGHT);
+    const cy = dot3(d, UP);
+    const cz = dot3(d, FWD);
+    if (cz < 0.01) return null;
+    const f = (H * 0.5) / HALF_TAN;
+    return [cx / cz * f + W * 0.5, -cy / cz * f + H * 0.5, cz];
+  }
+
+  function rotPt([px, py, pz]: Vec3, ry: number): Vec3 {
+    const c = Math.cos(ry);
+    const s = Math.sin(ry);
+    return [c * px + s * pz, py, -s * px + c * pz];
+  }
+
+  function shade(base: Color, wv: Vec3[]): string {
+    const ab: Vec3 = [wv[1][0] - wv[0][0], wv[1][1] - wv[0][1], wv[1][2] - wv[0][2]];
+    const ac: Vec3 = [wv[2][0] - wv[0][0], wv[2][1] - wv[0][1], wv[2][2] - wv[0][2]];
+    const n = norm3(cross3(ab, ac));
+    const d = Math.max(0, dot3(n, SUN));
+    const ch = (b: number, sunC: number, amb: number): number =>
+      Math.round(Math.min(255, (b / 255) * (amb + d * sunC) * 255));
+    return `rgb(${ch(base[0], SUN_C[0], AMB[0])},${ch(base[1], SUN_C[1], AMB[1])},${ch(base[2], SUN_C[2], AMB[2])})`;
+  }
+
+  function buildLathe(prof: Profile, col: Color, capTop = false): Mesh {
+    const verts: Vec3[] = [];
+    const faces: Face[] = [];
+    const pn = prof.length;
+    for (let seg = 0; seg <= SEGS; seg++) {
+      const ang = (seg / SEGS) * Math.PI * 2;
+      for (let pi = 0; pi < pn; pi++)
+        verts.push([prof[pi][0] * Math.cos(ang), prof[pi][1], prof[pi][0] * Math.sin(ang)]);
+    }
+    for (let seg = 0; seg < SEGS; seg++)
+      for (let pi = 0; pi < pn - 1; pi++) {
+        const va = seg * pn + pi;
+        const vb = seg * pn + pi + 1;
+        const vc = (seg + 1) * pn + pi + 1;
+        const vd = (seg + 1) * pn + pi;
+        faces.push({ v: [va, vb, vc, vd], c: col });
+      }
+    if (capTop) {
+      const topY = prof[pn - 1][1];
+      const ci = verts.length;
+      verts.push([0, topY, 0]);
+      for (let seg = 0; seg < SEGS; seg++) {
+        const nxt = (seg + 1) % SEGS;
+        faces.push({ v: [ci, nxt * pn + (pn - 1), seg * pn + (pn - 1)], c: col });
+      }
+    }
+    return { verts, faces };
+  }
+
+  function buildCylinder(rT: number, rB: number, h: number, col: Color): Mesh {
+    const verts: Vec3[] = [];
+    const faces: Face[] = [];
+    for (let seg = 0; seg <= SEGS; seg++) {
+      const ang = (seg / SEGS) * Math.PI * 2;
+      verts.push([rT * Math.cos(ang), h * 0.5, rT * Math.sin(ang)]);
+      verts.push([rB * Math.cos(ang), -h * 0.5, rB * Math.sin(ang)]);
+    }
+    for (let seg = 0; seg < SEGS; seg++)
+      faces.push({ v: [seg * 2, (seg + 1) * 2, (seg + 1) * 2 + 1, seg * 2 + 1], c: col });
+    const ci = verts.length;
+    verts.push([0, h * 0.5, 0]);
+    for (let seg = 0; seg < SEGS; seg++) {
+      const nxt = (seg + 1) % SEGS;
+      faces.push({ v: [ci, nxt * 2, seg * 2], c: col });
+    }
+    return { verts, faces };
+  }
+
+  const LOWER: Profile = [[4.5, 0], [4.3, 0.3], [3.8, 0.8], [3.1, 1.5], [2.3, 2.3], [1.6, 3.1]];
+  const UPPER: Profile = [[1.6, 3.1], [1.0, 3.8], [0.4, 4.5]];
+  const MESHES: Mesh[] = [
+    buildLathe(LOWER, [42, 46, 58]),
+    buildLathe(UPPER, [228, 234, 242], true),
+    buildCylinder(4.8, 5.1, 0.4, [32, 58, 32]),
+  ];
+
+  function render(): void {
+    ctx.fillStyle = "#1a2744";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    for (const [sx, sy, sz] of stars) {
+      const p = project(sx, sy, sz);
+      if (p) ctx.fillRect(Math.round(p[0]), Math.round(p[1]), 1, 1);
+    }
+
+    const allFaces: ProjectedFace[] = [];
+    for (const mesh of MESHES) {
+      for (const face of mesh.faces) {
+        const wv = face.v.map((i) => rotPt(mesh.verts[i], rotY));
+        const pvRaw = wv.map((v) => project(v[0], v[1], v[2]));
+        if (pvRaw.some((p) => p === null)) continue;
+        const pv = pvRaw as Vec3[];
+        const depth = pv.reduce((s, p) => s + p[2], 0) / pv.length;
+        allFaces.push({ pv, wv, c: face.c, depth });
+      }
+    }
+
+    allFaces.sort((a, b) => b.depth - a.depth);
+    for (const f of allFaces) {
+      ctx.fillStyle = shade(f.c, f.wv);
+      ctx.beginPath();
+      ctx.moveTo(f.pv[0][0], f.pv[0][1]);
+      for (let i = 1; i < f.pv.length; i++) ctx.lineTo(f.pv[i][0], f.pv[i][1]);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  function loop(): void {
+    requestAnimationFrame(loop);
+    rotY += 0.006;
+    render();
+  }
+  loop();
+})();
