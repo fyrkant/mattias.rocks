@@ -6,9 +6,7 @@
   "scripts": {
     "clean": "rm -rf _site",
     "build": "npm run clean && eleventy && npm run css",
-    "watch": "eleventy --watch",
-    "serve": "eleventy --serve",
-    "dev": "npm run css:watch | npm run serve",
+    "dev": "eleventy --serve",
     "debug": "DEBUG=* eleventy",
     "css": "postcss css/styles.pcss -o _site/styles.min.css",
     "css:watch": "postcss css/styles.pcss -o _site/styles.min.css -w"
@@ -21,6 +19,7 @@
     "@11ty/eleventy-navigation": "^1.0.5",
     "@11ty/eleventy-plugin-rss": "^2.0.4",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.2",
+    "@11ty/eleventy-plugin-vite": "^7.0.0",
     "@fullhuman/postcss-purgecss": "^8.0.0",
     "cssnano": "^7.1.2",
     "dayjs": "^1.11.19",
@@ -29,11 +28,13 @@
     "markdown-it-anchor": "^9.2.0",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
-    "postcss-preset-env": "^10.1.5",
     "postcss-each": "^1.1.0",
     "postcss-import": "^16.1.1",
     "postcss-nested": "^7.0.2",
-    "purgecss": "^8.0.0"
+    "postcss-preset-env": "^10.1.5",
+    "purgecss": "^8.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
   },
   "dependencies": {
     "@mightyplow/eleventy-plugin-cache-buster": "^1.1.3",
