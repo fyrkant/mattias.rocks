@@ -29,6 +29,11 @@ interface ProjectedFace {
   let W = 1;
   let H = 1;
 
+  let dragging = false;
+  let lastX = 0;
+  const BASE_VELOCITY = 0.006;
+  let velocity = BASE_VELOCITY;
+
   function resize(): void {
     W = Math.max(1, Math.round(canvas!.clientWidth * 0.5));
     H = Math.max(1, Math.round(canvas!.clientHeight * 0.5));
@@ -186,9 +191,48 @@ interface ProjectedFace {
     }
   }
 
+  function clientX(e: MouseEvent | TouchEvent): number {
+    return "touches" in e ? e.touches[0].clientX : e.clientX;
+  }
+
+  canvas.style.cursor = "grab";
+
+  canvas.addEventListener("mousedown", (e) => {
+    dragging = true;
+    lastX = clientX(e);
+    canvas!.style.cursor = "grabbing";
+  });
+  canvas.addEventListener("touchstart", (e) => {
+    dragging = true;
+    lastX = clientX(e);
+    e.preventDefault();
+  }, { passive: false });
+
+  function onMove(e: MouseEvent | TouchEvent): void {
+    if (!dragging) return;
+    const x = clientX(e);
+    const dx = x - lastX;
+    const scaledDx = dx / W;
+    velocity = scaledDx * Math.PI * 2;
+    rotY += velocity;
+    lastX = x;
+  }
+  canvas.addEventListener("mousemove", onMove);
+  canvas.addEventListener("touchmove", onMove, { passive: false });
+
+  function onEnd(): void {
+    dragging = false;
+    canvas!.style.cursor = "grab";
+  }
+  window.addEventListener("mouseup", onEnd);
+  window.addEventListener("touchend", onEnd);
+
   function loop(): void {
     requestAnimationFrame(loop);
-    rotY += 0.006;
+    if (!dragging) {
+      rotY += velocity;
+      velocity += (BASE_VELOCITY - velocity) * 0.02;
+    }
     render();
   }
   loop();
