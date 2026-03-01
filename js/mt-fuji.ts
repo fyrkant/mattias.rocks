@@ -240,11 +240,11 @@ interface ProjectedFace {
   window.addEventListener("touchend", onEnd);
 
   // Toggle sticky state when hero canvas leaves viewport
-  const header = document.querySelector("header");
-  if (header && "IntersectionObserver" in window) {
+  const nav = document.querySelector("nav");
+  if (nav && "IntersectionObserver" in window) {
     const observer = new IntersectionObserver(
       (entries) => {
-        header.classList.toggle("fuji-sticky", !entries[0].isIntersecting);
+        nav.classList.toggle("fuji-sticky", !entries[0].isIntersecting);
       },
       { threshold: 0 }
     );

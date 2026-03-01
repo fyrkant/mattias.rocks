@@ -3,7 +3,7 @@ layout: layout.njk
 ---
 
 <ol class="post-list" aria-label="Posts">
-  {% for post in collections.post | reverse %}
+  {% for post in collections.post %}
   <li class="post-list__item">
     <a href="{{ post.url | url }}" class="post-list__link">
       <div class="post-list__meta">
