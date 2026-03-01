@@ -23,37 +23,115 @@ interface ProjectedFace {
   const canvas = document.getElementById("mt-fuji") as HTMLCanvasElement | null;
   if (!canvas) return;
   const ctx = canvas.getContext("2d")!;
-
-  const canvasMini = document.getElementById("mt-fuji-mini") as HTMLCanvasElement | null;
-  const ctxMini = canvasMini?.getContext("2d") ?? null;
+  const nav = document.querySelector("nav") as HTMLElement | null;
 
   const SEGS = 9;
+  const MINI_SIZE = 44;
+  const HERO_H = 300;
+  const ANIM_RANGE = 220; // px of scroll over which transition plays
+
   let rotY = 0;
   let W = 1;
   let H = 1;
-  let Wm = 1;
-  let Hm = 1;
 
   let dragging = false;
   let lastX = 0;
   const BASE_VELOCITY = 0.006;
   let velocity = BASE_VELOCITY;
 
-  function resize(): void {
-    W = Math.max(1, Math.round(canvas!.clientWidth * 0.5));
-    H = Math.max(1, Math.round(canvas!.clientHeight * 0.5));
-    canvas!.width = W;
-    canvas!.height = H;
+  // Placeholder holds the hero's layout space; canvas itself is always fixed.
+  const heroPH = document.createElement("div");
+  heroPH.setAttribute("aria-hidden", "true");
+  heroPH.style.height = HERO_H + "px";
+  canvas.parentElement!.insertBefore(heroPH, canvas);
 
-    if (canvasMini) {
-      Wm = Math.max(1, canvasMini.clientWidth);
-      Hm = Math.max(1, canvasMini.clientHeight);
-      canvasMini.width = Wm;
-      canvasMini.height = Hm;
+  canvas.style.cssText = "position:fixed;z-index:101;image-rendering:pixelated;image-rendering:crisp-edges;";
+
+  // ── helpers ──────────────────────────────────────────────────────────────
+
+  function lerp(a: number, b: number, t: number): number {
+    return a + (b - a) * t;
+  }
+
+  function clamp(v: number, lo: number, hi: number): number {
+    return Math.max(lo, Math.min(hi, v));
+  }
+
+  function easeInOut(t: number): number {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  }
+
+  // ── resize ───────────────────────────────────────────────────────────────
+
+  function setBuffer(w: number, h: number): void {
+    W = Math.max(1, Math.round(w * 0.5));
+    H = Math.max(1, Math.round(h * 0.5));
+    canvas.width = W;
+    canvas.height = H;
+  }
+
+  function resize(): void {
+    setBuffer(heroPH.offsetWidth || window.innerWidth, HERO_H);
+  }
+
+  resize();
+  window.addEventListener("resize", () => {
+    resize();
+    updateLayout();
+  });
+
+  // ── scroll-driven layout ──────────────────────────────────────────────────
+
+  function getMiniPos(): { top: number; left: number } {
+    if (!nav) return { top: 8, left: 120 };
+    const nr = nav.getBoundingClientRect();
+    const np = nav.querySelector("p");
+    const pr = np ? np.getBoundingClientRect() : nr;
+    return {
+      top: nr.top + (nr.height - MINI_SIZE) / 2,
+      left: pr.right + 12,
+    };
+  }
+
+  let prevDocked = false;
+
+  function updateLayout(): void {
+    const ph = heroPH.getBoundingClientRect();
+    const navBottom = nav ? nav.getBoundingClientRect().bottom : 0;
+
+    // progress 0 = hero fully below nav, 1 = fully docked
+    const raw = (navBottom - ph.top) / ANIM_RANGE;
+    const progress = clamp(raw, 0, 1);
+    const t = easeInOut(progress);
+
+    if (progress <= 0) {
+      // Follow placeholder naturally
+      canvas.style.top = ph.top + "px";
+      canvas.style.left = ph.left + "px";
+      canvas.style.width = ph.width + "px";
+      canvas.style.height = HERO_H + "px";
+      canvas.style.borderRadius = "0px";
+      if (prevDocked) { setBuffer(ph.width, HERO_H); prevDocked = false; }
+    } else {
+      const mini = getMiniPos();
+      const top  = lerp(navBottom, mini.top, t);
+      const left = lerp(ph.left,   mini.left, t);
+      const w    = lerp(ph.width,  MINI_SIZE, t);
+      const h    = lerp(HERO_H,    MINI_SIZE, t);
+      const br   = lerp(0, 6, t);
+
+      canvas.style.top          = top  + "px";
+      canvas.style.left         = left + "px";
+      canvas.style.width        = w    + "px";
+      canvas.style.height       = h    + "px";
+      canvas.style.borderRadius = br   + "px";
+
+      if (progress >= 1 && !prevDocked) { setBuffer(MINI_SIZE, MINI_SIZE); prevDocked = true; }
+      if (progress < 1 && prevDocked)   { setBuffer(ph.width, HERO_H);     prevDocked = false; }
     }
   }
-  resize();
-  window.addEventListener("resize", resize);
+
+  // ── 3-D math ─────────────────────────────────────────────────────────────
 
   function norm3([x, y, z]: Vec3): Vec3 {
     const l = Math.sqrt(x * x + y * y + z * z) || 1;
@@ -203,6 +281,8 @@ interface ProjectedFace {
     }
   }
 
+  // ── drag interaction ──────────────────────────────────────────────────────
+
   function clientX(e: MouseEvent | TouchEvent): number {
     return "touches" in e ? e.touches[0].clientX : e.clientX;
   }
@@ -239,19 +319,17 @@ interface ProjectedFace {
   window.addEventListener("mouseup", onEnd);
   window.addEventListener("touchend", onEnd);
 
-  // Toggle sticky state when hero canvas leaves viewport
-  const nav = document.querySelector("nav");
-  if (nav && "IntersectionObserver" in window) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        nav.classList.toggle("fuji-sticky", !entries[0].isIntersecting);
-      },
-      { threshold: 0 }
-    );
-    observer.observe(canvas);
-  }
+  // ── animation loop ────────────────────────────────────────────────────────
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Reduced-motion: update layout on scroll without smooth animation
+  if (reducedMotion) {
+    window.addEventListener("scroll", () => {
+      updateLayout();
+      renderTo(ctx, W, H);
+    }, { passive: true });
+  }
 
   function loop(): void {
     if (!reducedMotion) requestAnimationFrame(loop);
@@ -259,8 +337,10 @@ interface ProjectedFace {
       rotY += velocity;
       velocity += (BASE_VELOCITY - velocity) * 0.02;
     }
+    updateLayout();
     renderTo(ctx, W, H);
-    if (ctxMini) renderTo(ctxMini, Wm, Hm);
   }
+
+  updateLayout();
   loop();
 })();

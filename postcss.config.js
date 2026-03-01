@@ -8,7 +8,6 @@ module.exports = {
     require('cssnano'),
     purgecss({
       content: ['./_site/**/*.html', './js/**/*.ts'],
-      safelist: ['fuji-sticky'],
     }),
   ],
 };
