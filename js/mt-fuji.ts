@@ -288,8 +288,12 @@ interface ProjectedFace {
         const miniRect = canvasMini.getBoundingClientRect();
         const ease = easeInOut(progress);
 
-        const newWf = Math.round(lerp(heroRect.width, miniRect.width, ease));
-        const newHf = Math.round(lerp(heroRect.height, miniRect.height, ease));
+        const dispW = Math.round(lerp(heroRect.width, miniRect.width, ease));
+        const dispH = Math.round(lerp(heroRect.height, miniRect.height, ease));
+        // Render at half resolution so image-rendering: pixelated scales it up 2×,
+        // matching the pixelated look of the hero canvas
+        const newWf = Math.max(1, Math.round(dispW * 0.5));
+        const newHf = Math.max(1, Math.round(dispH * 0.5));
         const top = lerp(0, miniRect.top, ease);
         const left = lerp(heroRect.left, miniRect.left, ease);
         const radius = lerp(0, 6, ease);
@@ -297,8 +301,8 @@ interface ProjectedFace {
         canvasFly.style.display = "block";
         canvasFly.style.top = `${top}px`;
         canvasFly.style.left = `${left}px`;
-        canvasFly.style.width = `${newWf}px`;
-        canvasFly.style.height = `${newHf}px`;
+        canvasFly.style.width = `${dispW}px`;
+        canvasFly.style.height = `${dispH}px`;
         canvasFly.style.borderRadius = `${radius}px`;
 
         if (newWf !== Wf || newHf !== Hf) {
