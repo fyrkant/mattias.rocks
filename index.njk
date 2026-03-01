@@ -2,11 +2,16 @@
 layout: layout.njk
 ---
 
-<ul>
+<ol class="post-list" aria-label="Posts">
   {% for post in collections.post | reverse %}
-  <li>
-    <a href="{{ post.url | url }}">{{ post.data.title }}</a>
-    <small><time datetime="{{ post.date | isoDate }}">{{ post.date | formatDate }}</time></small>
+  <li class="post-list__item">
+    <a href="{{ post.url | url }}" class="post-list__link">
+      <div class="post-list__meta">
+        <span class="post-list__num">{% if loop.index < 10 %}0{% endif %}{{ loop.index }}</span>
+        <time class="post-list__date" datetime="{{ post.date | isoDate }}">{{ post.date | isoDate }}</time>
+      </div>
+      <span class="post-list__title">{{ post.data.title }}</span>
+    </a>
   </li>
   {% endfor %}
-</ul>
+</ol>
