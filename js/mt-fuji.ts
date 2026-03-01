@@ -227,9 +227,11 @@ interface ProjectedFace {
   window.addEventListener("mouseup", onEnd);
   window.addEventListener("touchend", onEnd);
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   function loop(): void {
-    requestAnimationFrame(loop);
-    if (!dragging) {
+    if (!reducedMotion) requestAnimationFrame(loop);
+    if (!dragging && !reducedMotion) {
       rotY += velocity;
       velocity += (BASE_VELOCITY - velocity) * 0.02;
     }
