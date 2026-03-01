@@ -187,8 +187,7 @@ interface ProjectedFace {
   ];
 
   function renderTo(targetCtx: CanvasRenderingContext2D, w: number, h: number): void {
-    targetCtx.fillStyle = "#1a2744";
-    targetCtx.fillRect(0, 0, w, h);
+    targetCtx.clearRect(0, 0, w, h);
 
     targetCtx.fillStyle = "rgba(255,255,255,0.85)";
     for (const [sx, sy, sz] of stars) {
