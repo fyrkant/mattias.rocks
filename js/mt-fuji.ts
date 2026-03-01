@@ -27,6 +27,14 @@ interface ProjectedFace {
   const canvasMini = document.getElementById("mt-fuji-mini") as HTMLCanvasElement | null;
   const ctxMini = canvasMini?.getContext("2d") ?? null;
 
+  const canvasFly = document.createElement("canvas");
+  canvasFly.id = "mt-fuji-fly";
+  canvasFly.setAttribute("aria-hidden", "true");
+  document.body.appendChild(canvasFly);
+  const ctxFly = canvasFly.getContext("2d")!;
+  let Wf = 0;
+  let Hf = 0;
+
   const SEGS = 9;
   let rotY = 0;
   let W = 1;
@@ -54,6 +62,14 @@ interface ProjectedFace {
   }
   resize();
   window.addEventListener("resize", resize);
+
+  function lerp(a: number, b: number, t: number): number {
+    return a + (b - a) * t;
+  }
+
+  function easeInOut(t: number): number {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  }
 
   function norm3([x, y, z]: Vec3): Vec3 {
     const l = Math.sqrt(x * x + y * y + z * z) || 1;
@@ -239,9 +255,11 @@ interface ProjectedFace {
   window.addEventListener("mouseup", onEnd);
   window.addEventListener("touchend", onEnd);
 
-  // Toggle sticky state when hero canvas leaves viewport
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // For reduced-motion users: toggle sticky class via IntersectionObserver + CSS fade
   const nav = document.querySelector("nav");
-  if (nav && "IntersectionObserver" in window) {
+  if (reducedMotion && nav && "IntersectionObserver" in window) {
     const observer = new IntersectionObserver(
       (entries) => {
         nav.classList.toggle("fuji-sticky", !entries[0].isIntersecting);
@@ -251,8 +269,6 @@ interface ProjectedFace {
     observer.observe(canvas);
   }
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   function loop(): void {
     if (!reducedMotion) requestAnimationFrame(loop);
     if (!dragging && !reducedMotion) {
@@ -261,6 +277,46 @@ interface ProjectedFace {
     }
     renderTo(ctx, W, H);
     if (ctxMini) renderTo(ctxMini, Wm, Hm);
+
+    if (!reducedMotion && canvasMini) {
+      const heroRect = canvas.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, -heroRect.top / heroRect.height));
+
+      // Fade hero out quickly as it scrolls off so fly canvas can take over cleanly
+      canvas.style.opacity = String(Math.max(0, 1 - progress * 6));
+
+      if (progress > 0 && progress < 1) {
+        const miniRect = canvasMini.getBoundingClientRect();
+        const ease = easeInOut(progress);
+
+        const newWf = Math.round(lerp(heroRect.width, miniRect.width, ease));
+        const newHf = Math.round(lerp(heroRect.height, miniRect.height, ease));
+        const top = lerp(0, miniRect.top, ease);
+        const left = lerp(heroRect.left, miniRect.left, ease);
+        const radius = lerp(0, 6, ease);
+
+        canvasFly.style.display = "block";
+        canvasFly.style.top = `${top}px`;
+        canvasFly.style.left = `${left}px`;
+        canvasFly.style.width = `${newWf}px`;
+        canvasFly.style.height = `${newHf}px`;
+        canvasFly.style.borderRadius = `${radius}px`;
+
+        if (newWf !== Wf || newHf !== Hf) {
+          Wf = newWf;
+          Hf = newHf;
+          canvasFly.width = Wf;
+          canvasFly.height = Hf;
+        }
+        renderTo(ctxFly, Wf, Hf);
+
+        (canvasMini as HTMLCanvasElement).style.opacity = "0";
+      } else {
+        canvasFly.style.display = "none";
+        (canvasMini as HTMLCanvasElement).style.opacity = progress >= 1 ? "1" : "0";
+        if (progress === 0) canvas.style.opacity = "1";
+      }
+    }
   }
   loop();
 })();
