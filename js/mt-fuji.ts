@@ -290,10 +290,10 @@ interface ProjectedFace {
 
         const dispW = Math.round(lerp(heroRect.width, miniRect.width, ease));
         const dispH = Math.round(lerp(heroRect.height, miniRect.height, ease));
-        // Render at half resolution so image-rendering: pixelated scales it up 2×,
-        // matching the pixelated look of the hero canvas
-        const newWf = Math.max(1, Math.round(dispW * 0.5));
-        const newHf = Math.max(1, Math.round(dispH * 0.5));
+        // Resolution factor lerps from 0.5 (hero: pixelated) to 1.0 (mini: 1:1 crisp)
+        const resFactor = lerp(0.5, 1.0, ease);
+        const newWf = Math.max(1, Math.round(dispW * resFactor));
+        const newHf = Math.max(1, Math.round(dispH * resFactor));
         const top = lerp(0, miniRect.top, ease);
         const left = lerp(heroRect.left, miniRect.left, ease);
         const radius = lerp(0, 6, ease);
