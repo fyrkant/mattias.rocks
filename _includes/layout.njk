@@ -27,15 +27,15 @@
   <body>
     <header>
       <nav>
-        <h1>
+        <p>
           <a href="/"> {{ site.title }} </a>
-        </h1>
+        </p>
       </nav>
-      <canvas id="mt-fuji"></canvas>
+      <canvas id="mt-fuji" aria-hidden="true"></canvas>
       {% if title %}
       <h1>{{ title }}</h1>
       <p>
-        <date>{{ date | formatDate }}</date>
+        <time datetime="{{ date | isoDate }}">{{ date | formatDate }}</time>
       </p>
       {% endif %}
     </header>

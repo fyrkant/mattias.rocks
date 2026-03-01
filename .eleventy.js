@@ -33,6 +33,9 @@ module.exports = async function (eleventyConfig) {
   eleventyConfig.addFilter('formatDate', (val) => {
     return dayjs(val).format('dddd, Do of MMMM YYYY');
   });
+  eleventyConfig.addFilter('isoDate', (val) => {
+    return dayjs(val).format('YYYY-MM-DD');
+  });
   eleventyConfig.addPassthroughCopy('img');
   eleventyConfig.addNunjucksAsyncFilter('addHash', (path, cb) => {
     hashPath(path).then((x) => cb(null, x)).catch((e) => cb(e))
