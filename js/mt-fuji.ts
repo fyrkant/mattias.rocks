@@ -281,10 +281,10 @@ interface ProjectedFace {
       const heroRect = canvas.getBoundingClientRect();
       const progress = Math.max(0, Math.min(1, -heroRect.top / heroRect.height));
 
-      // Fade hero out quickly as it scrolls off so fly canvas can take over cleanly
-      canvas.style.opacity = String(Math.max(0, 1 - progress * 6));
-
       if (progress > 0 && progress < 1) {
+        // Hide hero instantly — fly canvas covers the same scene, swap is seamless
+        canvas.style.opacity = "0";
+
         const miniRect = canvasMini.getBoundingClientRect();
         const ease = easeInOut(progress);
 
@@ -312,8 +312,8 @@ interface ProjectedFace {
         (canvasMini as HTMLCanvasElement).style.opacity = "0";
       } else {
         canvasFly.style.display = "none";
+        canvas.style.opacity = "1";
         (canvasMini as HTMLCanvasElement).style.opacity = progress >= 1 ? "1" : "0";
-        if (progress === 0) canvas.style.opacity = "1";
       }
     }
   }
