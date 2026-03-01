@@ -7,7 +7,8 @@ module.exports = {
     require('postcss-preset-env')(),
     require('cssnano'),
     purgecss({
-      content: ['./_site/**/*.html'],
+      content: ['./_site/**/*.html', './js/**/*.ts'],
+      safelist: ['fuji-sticky'],
     }),
   ],
 };
