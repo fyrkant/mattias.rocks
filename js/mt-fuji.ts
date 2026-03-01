@@ -24,10 +24,23 @@ interface ProjectedFace {
   if (!canvas) return;
   const ctx = canvas.getContext("2d")!;
 
+  const canvasMini = document.getElementById("mt-fuji-mini") as HTMLCanvasElement | null;
+  const ctxMini = canvasMini?.getContext("2d") ?? null;
+
+  const canvasFly = document.createElement("canvas");
+  canvasFly.id = "mt-fuji-fly";
+  canvasFly.setAttribute("aria-hidden", "true");
+  document.body.appendChild(canvasFly);
+  const ctxFly = canvasFly.getContext("2d")!;
+  let Wf = 0;
+  let Hf = 0;
+
   const SEGS = 9;
   let rotY = 0;
   let W = 1;
   let H = 1;
+  let Wm = 1;
+  let Hm = 1;
 
   let dragging = false;
   let lastX = 0;
@@ -39,9 +52,24 @@ interface ProjectedFace {
     H = Math.max(1, Math.round(canvas!.clientHeight * 0.5));
     canvas!.width = W;
     canvas!.height = H;
+
+    if (canvasMini) {
+      Wm = Math.max(1, canvasMini.clientWidth);
+      Hm = Math.max(1, canvasMini.clientHeight);
+      canvasMini.width = Wm;
+      canvasMini.height = Hm;
+    }
   }
   resize();
   window.addEventListener("resize", resize);
+
+  function lerp(a: number, b: number, t: number): number {
+    return a + (b - a) * t;
+  }
+
+  function easeInOut(t: number): number {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  }
 
   function norm3([x, y, z]: Vec3): Vec3 {
     const l = Math.sqrt(x * x + y * y + z * z) || 1;
@@ -76,14 +104,14 @@ interface ProjectedFace {
       ] as Vec3
   );
 
-  function project(wx: number, wy: number, wz: number): Vec3 | null {
+  function project(wx: number, wy: number, wz: number, w: number, h: number): Vec3 | null {
     const d: Vec3 = [wx - EYE[0], wy - EYE[1], wz - EYE[2]];
     const cx = dot3(d, RIGHT);
     const cy = dot3(d, UP);
     const cz = dot3(d, FWD);
     if (cz < 0.01) return null;
-    const f = (H * 0.5) / HALF_TAN;
-    return [cx / cz * f + W * 0.5, -cy / cz * f + H * 0.5, cz];
+    const f = (h * 0.5) / HALF_TAN;
+    return [cx / cz * f + w * 0.5, -cy / cz * f + h * 0.5, cz];
   }
 
   function rotPt([px, py, pz]: Vec3, ry: number): Vec3 {
@@ -158,21 +186,20 @@ interface ProjectedFace {
     buildCylinder(4.8, 5.1, 0.4, [32, 58, 32]),
   ];
 
-  function render(): void {
-    ctx.fillStyle = "#1a2744";
-    ctx.fillRect(0, 0, W, H);
+  function renderTo(targetCtx: CanvasRenderingContext2D, w: number, h: number): void {
+    targetCtx.clearRect(0, 0, w, h);
 
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    targetCtx.fillStyle = "rgba(255,255,255,0.85)";
     for (const [sx, sy, sz] of stars) {
-      const p = project(sx, sy, sz);
-      if (p) ctx.fillRect(Math.round(p[0]), Math.round(p[1]), 1, 1);
+      const p = project(sx, sy, sz, w, h);
+      if (p) targetCtx.fillRect(Math.round(p[0]), Math.round(p[1]), 1, 1);
     }
 
     const allFaces: ProjectedFace[] = [];
     for (const mesh of MESHES) {
       for (const face of mesh.faces) {
         const wv = face.v.map((i) => rotPt(mesh.verts[i], rotY));
-        const pvRaw = wv.map((v) => project(v[0], v[1], v[2]));
+        const pvRaw = wv.map((v) => project(v[0], v[1], v[2], w, h));
         if (pvRaw.some((p) => p === null)) continue;
         const pv = pvRaw as Vec3[];
         const depth = pv.reduce((s, p) => s + p[2], 0) / pv.length;
@@ -182,12 +209,12 @@ interface ProjectedFace {
 
     allFaces.sort((a, b) => b.depth - a.depth);
     for (const f of allFaces) {
-      ctx.fillStyle = shade(f.c, f.wv);
-      ctx.beginPath();
-      ctx.moveTo(f.pv[0][0], f.pv[0][1]);
-      for (let i = 1; i < f.pv.length; i++) ctx.lineTo(f.pv[i][0], f.pv[i][1]);
-      ctx.closePath();
-      ctx.fill();
+      targetCtx.fillStyle = shade(f.c, f.wv);
+      targetCtx.beginPath();
+      targetCtx.moveTo(f.pv[0][0], f.pv[0][1]);
+      for (let i = 1; i < f.pv.length; i++) targetCtx.lineTo(f.pv[i][0], f.pv[i][1]);
+      targetCtx.closePath();
+      targetCtx.fill();
     }
   }
 
@@ -229,13 +256,70 @@ interface ProjectedFace {
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // For reduced-motion users: toggle sticky class via IntersectionObserver + CSS fade
+  const nav = document.querySelector("nav");
+  if (reducedMotion && nav && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        nav.classList.toggle("fuji-sticky", !entries[0].isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+  }
+
   function loop(): void {
     if (!reducedMotion) requestAnimationFrame(loop);
     if (!dragging && !reducedMotion) {
       rotY += velocity;
       velocity += (BASE_VELOCITY - velocity) * 0.02;
     }
-    render();
+    renderTo(ctx, W, H);
+    if (ctxMini) renderTo(ctxMini, Wm, Hm);
+
+    if (!reducedMotion && canvasMini) {
+      const heroRect = canvas.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, -heroRect.top / heroRect.height));
+
+      if (progress > 0 && progress < 1) {
+        // Hide hero instantly — fly canvas covers the same scene, swap is seamless
+        canvas.style.opacity = "0";
+
+        const miniRect = canvasMini.getBoundingClientRect();
+        const ease = easeInOut(progress);
+
+        const dispW = Math.round(lerp(heroRect.width, miniRect.width, ease));
+        const dispH = Math.round(lerp(heroRect.height, miniRect.height, ease));
+        // Resolution factor lerps from 0.5 (hero: pixelated) to 1.0 (mini: 1:1 crisp)
+        const resFactor = lerp(0.5, 1.0, ease);
+        const newWf = Math.max(1, Math.round(dispW * resFactor));
+        const newHf = Math.max(1, Math.round(dispH * resFactor));
+        const top = lerp(0, miniRect.top, ease);
+        const left = lerp(heroRect.left, miniRect.left, ease);
+        const radius = lerp(0, 6, ease);
+
+        canvasFly.style.display = "block";
+        canvasFly.style.top = `${top}px`;
+        canvasFly.style.left = `${left}px`;
+        canvasFly.style.width = `${dispW}px`;
+        canvasFly.style.height = `${dispH}px`;
+        canvasFly.style.borderRadius = `${radius}px`;
+
+        if (newWf !== Wf || newHf !== Hf) {
+          Wf = newWf;
+          Hf = newHf;
+          canvasFly.width = Wf;
+          canvasFly.height = Hf;
+        }
+        renderTo(ctxFly, Wf, Hf);
+
+        (canvasMini as HTMLCanvasElement).style.opacity = "0";
+      } else {
+        canvasFly.style.display = "none";
+        canvas.style.opacity = "1";
+        (canvasMini as HTMLCanvasElement).style.opacity = progress >= 1 ? "1" : "0";
+      }
+    }
   }
   loop();
 })();
