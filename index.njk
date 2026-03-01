@@ -7,7 +7,7 @@ layout: layout.njk
   <li class="post-list__item">
     <a href="{{ post.url | url }}" class="post-list__link">
       <div class="post-list__meta">
-        <span class="post-list__num">{% if loop.index < 10 %}0{% endif %}{{ loop.index }}</span>
+        <span class="post-list__num">{% if loop.revindex < 10 %}0{% endif %}{{ loop.revindex }}</span>
         <time class="post-list__date" datetime="{{ post.date | isoDate }}">{{ post.date | isoDate }}</time>
       </div>
       <span class="post-list__title">{{ post.data.title }}</span>
