@@ -5,11 +5,9 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf _site",
-    "build": "npm run clean && eleventy && npm run css",
+    "build": "npm run clean && eleventy",
     "dev": "eleventy --serve",
-    "debug": "DEBUG=* eleventy",
-    "css": "postcss css/styles.pcss -o _site/styles.min.css",
-    "css:watch": "postcss css/styles.pcss -o _site/styles.min.css -w"
+    "debug": "DEBUG=* eleventy"
   },
   "keywords": [],
   "author": "",
@@ -20,19 +18,10 @@
     "@11ty/eleventy-plugin-rss": "^2.0.4",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.2",
     "@11ty/eleventy-plugin-vite": "^7.0.0",
-    "@fullhuman/postcss-purgecss": "^8.0.0",
-    "cssnano": "^7.1.2",
     "dayjs": "^1.11.19",
     "luxon": "^3.7.2",
     "markdown-it": "^14.1.1",
     "markdown-it-anchor": "^9.2.0",
-    "postcss": "^8.5.6",
-    "postcss-cli": "^11.0.1",
-    "postcss-each": "^1.1.0",
-    "postcss-import": "^16.1.1",
-    "postcss-nested": "^7.0.2",
-    "postcss-preset-env": "^10.1.5",
-    "purgecss": "^8.0.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
   },

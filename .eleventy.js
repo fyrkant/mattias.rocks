@@ -8,19 +8,9 @@ const readFile = promisify(fs.readFile);
 dayjs.extend(advancedFormat);
 
 const hashPath = async (path) => {
-  console.log(path);
-  if (/.css$/.test(path)) {
-    console.log('hello', path);
-    return `${path}?v=${new Date().getTime()}`;
-  }
-
-  const file = await readFile(`_site${path}`, {
-    encoding: 'utf-8',
-  });
+  const file = await readFile(`_site${path}`, { encoding: 'utf-8' });
   const hash = crypto.createHash('sha512').update(file).digest('hex');
-  const hashedPath = `${path}?hash=${hash.substr(0, 10)}`;
-  console.log('hashed', hashedPath);
-  return hashedPath;
+  return `${path}?hash=${hash.substr(0, 10)}`;
 };
 
 module.exports = async function (eleventyConfig) {
@@ -34,6 +24,7 @@ module.exports = async function (eleventyConfig) {
     viteOptions: { build: { emptyOutDir: false } },
   });
   eleventyConfig.addPassthroughCopy("js");
+  eleventyConfig.addPassthroughCopy("css");
   eleventyConfig.addPlugin(pluginSyntaxHighlight);
   eleventyConfig.addFilter('formatDate', (val) => {
     return dayjs(val).format('dddd, Do of MMMM YYYY');
