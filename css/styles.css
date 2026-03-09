@@ -40,6 +40,12 @@
   --input-bg: light-dark(#f6f6f6, #1e2d4a);
   --input-fg: light-dark(#212529, #fdfdfd);
   --input-border: light-dark(#ccc, #3d4f6b);
+  --kbd-bg: light-dark(#f9f9f9, #1e2d4a);
+  --kbd-border: light-dark(#d8d8d8, #3d4f6b);
+  --kbd-border-bottom: light-dark(#a6a5a6, #0f1a2e);
+  --abbr-border: light-dark(#949394, #707070);
+  --post-meta-border: light-dark(rgba(255, 46, 136, 0.3), rgba(255, 46, 136, 0.25));
+  --post-date-color: light-dark(rgba(26, 39, 68, 0.5), rgba(253, 253, 253, 0.35));
 
   --font-sans-serif: system-ui, -apple-system, segoe ui, roboto, ubuntu, helvetica, cantarell,
     noto sans, sans-serif;
@@ -362,15 +368,15 @@ kbd {
   font-size: 0.64rem;
   color: var(--code-fg);
   vertical-align: middle;
-  background-color: light-dark(#f9f9f9, #1e2d4a);
-  border: solid 1px light-dark(#d8d8d8, #3d4f6b);
-  border-bottom: solid 2px light-dark(#a6a5a6, #0f1a2e);
+  background-color: var(--kbd-bg);
+  border: solid 1px var(--kbd-border);
+  border-bottom: solid 2px var(--kbd-border-bottom);
   border-radius: 5px;
 }
 
 abbr {
   text-decoration: none;
-  border-bottom: 2px dashed light-dark(#949394, #707070);
+  border-bottom: 2px dashed var(--abbr-border);
 }
 
 @media (hover: hover) {
@@ -450,7 +456,7 @@ nav.fuji-sticky #mt-fuji-mini {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  border-top: 1px solid light-dark(rgba(255, 46, 136, 0.3), rgba(255, 46, 136, 0.25));
+  border-top: 1px solid var(--post-meta-border);
   padding-top: 0.75rem;
   margin-bottom: 0.5rem;
   transition: border-color 0.2s;
@@ -468,7 +474,7 @@ nav.fuji-sticky #mt-fuji-mini {
   font-family: var(--font-monospace);
   font-size: 0.7rem;
   letter-spacing: 0.04em;
-  color: light-dark(rgba(26, 39, 68, 0.5), rgba(253, 253, 253, 0.35));
+  color: var(--post-date-color);
 }
 
 .post-list__title {
