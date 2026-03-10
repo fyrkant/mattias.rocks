@@ -222,7 +222,14 @@ interface ProjectedFace {
     return "touches" in e ? e.touches[0].clientX : e.clientX;
   }
 
+  function clientY(e: MouseEvent | TouchEvent): number {
+    return "touches" in e ? e.touches[0].clientY : e.clientY;
+  }
+
   canvas.style.cursor = "grab";
+
+  let lastY = 0;
+  let touchLocked: "horizontal" | "vertical" | null = null;
 
   canvas.addEventListener("mousedown", (e) => {
     dragging = true;
@@ -232,11 +239,27 @@ interface ProjectedFace {
   canvas.addEventListener("touchstart", (e) => {
     dragging = true;
     lastX = clientX(e);
-    e.preventDefault();
-  }, { passive: false });
+    lastY = clientY(e);
+    touchLocked = null;
+  }, { passive: true });
 
   function onMove(e: MouseEvent | TouchEvent): void {
     if (!dragging) return;
+
+    if ("touches" in e) {
+      const dx = Math.abs(clientX(e) - lastX);
+      const dy = Math.abs(clientY(e) - lastY);
+
+      if (touchLocked === null) {
+        if (dx > 5 || dy > 5) {
+          touchLocked = dx >= dy ? "horizontal" : "vertical";
+        }
+      }
+
+      if (touchLocked !== "horizontal") return;
+      e.preventDefault();
+    }
+
     const x = clientX(e);
     const dx = x - lastX;
     const scaledDx = dx / W;
@@ -249,6 +272,7 @@ interface ProjectedFace {
 
   function onEnd(): void {
     dragging = false;
+    touchLocked = null;
     canvas!.style.cursor = "grab";
   }
   window.addEventListener("mouseup", onEnd);
