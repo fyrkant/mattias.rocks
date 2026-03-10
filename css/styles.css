@@ -20,8 +20,6 @@
 
   --primary: #1e555c;
   --light-primary: #2332ea;
-  --secondary: #ff2e88;
-  --light-secondary: #fc77b1;
   --red: red;
   --black: #212529;
   --white: #fdfdfd;
@@ -34,6 +32,7 @@
   --bg: light-dark(#f5f7fa, #1a2744);
   --fg: light-dark(#1a2744, #fdfdfd);
   --link-color: light-dark(#b8005a, #fc77b1);
+  --secondary: light-dark(#c4004c, #ff2e88);
   --code-bg: light-dark(#eef0f2, #263238);
   --code-fg: light-dark(#2d3748, #c3cee3);
   --divider-color: light-dark(#ccc, #3d4f6b);
