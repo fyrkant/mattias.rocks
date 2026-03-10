@@ -222,21 +222,52 @@ interface ProjectedFace {
     return "touches" in e ? e.touches[0].clientX : e.clientX;
   }
 
+  function clientY(e: MouseEvent | TouchEvent): number {
+    return "touches" in e ? e.touches[0].clientY : e.clientY;
+  }
+
   canvas.style.cursor = "grab";
+
+  let lastY = 0;
+  // Tracks which axis the current touch gesture was committed to.
+  // null = not yet decided, "horizontal" = rotating the mountain, "vertical" = scrolling the page.
+  let touchLocked: "horizontal" | "vertical" | null = null;
 
   canvas.addEventListener("mousedown", (e) => {
     dragging = true;
     lastX = clientX(e);
     canvas!.style.cursor = "grabbing";
   });
+  // passive: true means we never block scrolling at the start of a touch —
+  // we just record where the finger landed and wait to see which way it moves.
   canvas.addEventListener("touchstart", (e) => {
     dragging = true;
     lastX = clientX(e);
-    e.preventDefault();
-  }, { passive: false });
+    lastY = clientY(e);
+    touchLocked = null;
+  }, { passive: true });
 
   function onMove(e: MouseEvent | TouchEvent): void {
     if (!dragging) return;
+
+    if ("touches" in e) {
+      const dx = Math.abs(clientX(e) - lastX);
+      const dy = Math.abs(clientY(e) - lastY);
+
+      // Wait until the finger has moved enough to tell direction (5px threshold),
+      // then commit to whichever axis had more movement.
+      if (touchLocked === null) {
+        if (dx > 5 || dy > 5) {
+          touchLocked = dx >= dy ? "horizontal" : "vertical";
+        }
+      }
+
+      // Vertical gesture → let the browser handle scrolling and do nothing.
+      // Horizontal gesture → take over and prevent the page from scrolling.
+      if (touchLocked !== "horizontal") return;
+      e.preventDefault();
+    }
+
     const x = clientX(e);
     const dx = x - lastX;
     const scaledDx = dx / W;
@@ -249,6 +280,7 @@ interface ProjectedFace {
 
   function onEnd(): void {
     dragging = false;
+    touchLocked = null;
     canvas!.style.cursor = "grab";
   }
   window.addEventListener("mouseup", onEnd);
