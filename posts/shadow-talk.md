@@ -5,15 +5,17 @@ tags: post
 layout: post
 ---
 
-It must have been something like 25 years ago, my brother told me: ”you know after you finish saying something you kind of move your lips silently again, mouthing the same phrase again?” This wasn’t something I had ever thought of or done consciously, I had no idea this was happening. Looking back now it’s easy to assume that it was simply me being a very self-conscious, careful and, well… neurotic kid. Before saying anything I went through it quietly in my mind time and time again, somehow preparing and maybe evaluating it before actually speaking it aloud. Then afterwards my lips, maybe stuck in the repetition, just repeated the same movements again.
+It must have been something like 25 years ago, my brother told me: *”you know after you finish saying something you kind of move your lips silently, mouthing the same phrase again?”* 
 
-I don’t remember exactly how my brother brought this up, I don’t think it was said in a teasing way but more of an interested question. ”Why the hell do you do that?”
+This wasn’t something I had ever thought of or done consciously, I had no idea this was happening. Looking back now it’s easy to assume that it was simply me being a very self-conscious, careful and, well… neurotic kid. Before saying anything I went through it quietly in my mind time and time again, somehow preparing and maybe evaluating it before actually speaking it aloud. Then afterwards my lips, maybe stuck in the repetition, just repeated the same movements again.
+
+I don’t remember exactly how my brother brought this up, I don’t think it was said in a teasing way but more of an interested question. *”Why the hell do you do that?”*
 
 After having it brought to my attention I of course tried to suppress my ”shadow  talking” though more often than not I think I was unsuccessful and I realized mid lip-movement that I was doing it again. 
 
 If it ever stopped? I don’t know, I honestly don’t know. My insecurity and cautiousness subsided some in my twenties. I picked up smoking after moving to Tokyo - just… something to do with my hands? Maybe a veil of smoke hiding my lips moving silently? No no, nothing so calculated but maybe just an unplanned positive. It helped.
 
-Nowadays nearing 40 years old I think I still do that quiet repetition and evaluation in my head before speaking, but now more and more often instead of being said and then quietly lipped again things just remain unsaid. If my 20s opened me up, my 30s must have closed me up again. 
+Nowadays nearing 40 years old I think I still do that quiet repetition and evaluation in my head before speaking, but now more and more often instead of being said and then quietly lipped again things just remain unsaid. If my 20s opened me up, my 30s must have closed me down again. 
 
 Why this is? 
 
