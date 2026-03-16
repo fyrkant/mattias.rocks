@@ -1,9 +1,9 @@
-—--
+---
 title: Shadow-talk
 date: 2026-03-16 
 tags: post
 layout: post
-—--
+---
 
 It must have been something like 25 years ago, my brother told me: ”you know after you finish saying something you kind of move your lips silently again, mouthing the same phrase again?” This wasn’t something I had ever thought of or done consciously, I had no idea this was happening. Looking back now it’s easy to assume that it was simply me being a very self-conscious, careful and, well… neurotic kid. Before saying anything I went through it quietly in my mind time and time again, somehow preparing and maybe evaluating it before actually speaking it aloud. Then afterwards my lips, maybe stuck in the repetition, just repeated the same movements again.
 
