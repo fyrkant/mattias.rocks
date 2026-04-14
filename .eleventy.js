@@ -16,7 +16,7 @@ const hashPath = async (path) => {
 module.exports = async function (eleventyConfig) {
   // Hide test posts on production; show them on branch/preview deploys and locally
   if (process.env.CONTEXT === 'production') {
-    eleventyConfig.ignores.add('posts/*.test.md');
+    eleventyConfig.ignores.add('sample-posts/');
   }
 
   const { default: EleventyVitePlugin } = await import("@11ty/eleventy-plugin-vite");
